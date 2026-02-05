@@ -24,10 +24,18 @@ namespace OOP_Laba_3
 
         }
 
-        private void mainForm_MouseClick(object sender, MouseEventArgs e)
+        private void mainForm_MouseDown(object sender, MouseEventArgs e)
         {
-            CCircle circle = new CCircle(e.X, e.Y);
-            container.Add(circle);
+            bool ctrl = (ModifierKeys & Keys.Control) == Keys.Control;
+            if (e.Button == MouseButtons.Right)
+            {
+                CCircle circle = new CCircle(e.X, e.Y);
+                container.Add(circle);
+            }
+            else if (e.Button == MouseButtons.Left)
+            {
+                container.OnMouseClick(e.X, e.Y, ctrl);
+            }
             Invalidate();
         }
 
@@ -46,6 +54,15 @@ namespace OOP_Laba_3
             container.Clear();
             Invalidate();
         }
+
+        private void mainForm_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Delete)
+            {
+                container.RemoveSelected();
+                Invalidate();
+            }
+        }
     };
     public class CCircle
     {
@@ -63,7 +80,7 @@ namespace OOP_Laba_3
         }
         public CCircle(int x, int y)
         {
-            Radius = 20;
+            Radius = 30;
             X = x;
             Y = y;
             Circle_color = Color.Black;
@@ -74,16 +91,28 @@ namespace OOP_Laba_3
             {
                 Circle_color = Color.Red;
             }
+            else
+            {
+                Circle_color = Color.Black;
+            }
             using (Pen pen = new Pen(Circle_color, 2))
             {
                 g.DrawEllipse(pen, X - Radius, Y - Radius, Radius * 2, Radius * 2);
             }
         }
-        private bool IsClicked(int mx, int my)
+        public void SetSelected(bool value)
+        {
+            Selected = value;
+        }
+        public bool IsSelected()
+        {
+            return Selected;
+        }
+        public bool IsClicked(int mx, int my)
         {
             int dx = mx - X;
             int dy = my - Y;
-            bool result = (dx * dx) + (dy * dy) <= (Radius * Radius);
+            bool result = ((dx * dx) + (dy * dy)) <= (Radius * Radius);
             return result;
         }
     }
@@ -101,9 +130,45 @@ namespace OOP_Laba_3
         }
         public void Clear()
         {
-            
             Circles.Clear();
-           
+        }
+        public void ClearSelection()
+        {
+            foreach (CCircle c in Circles)
+            {
+                c.SetSelected(false);
+            }
+        }
+        public void OnMouseClick(int x, int y, bool ctrlPressed)
+        {
+            bool ALOS_flag = false; // (At Least One Selected - flag)
+            foreach (CCircle c in Circles)
+            {
+                if (c.IsClicked(x, y))
+                {
+                    ALOS_flag = true;
+                    if (!ctrlPressed)
+                    {
+                        ClearSelection();
+                    }
+                    c.SetSelected(!c.IsSelected());
+                    break;
+                }
+            }
+            if (!ALOS_flag && !ctrlPressed)
+            {
+                ClearSelection();
+            }
+        }
+        public void RemoveSelected()
+        {
+            foreach (CCircle c in Circles)
+            {
+                if (c.IsSelected())
+                {
+                    Circles.Remove(c);
+                }
+            }
         }
         public void DrawAll(Graphics g)
         {

@@ -51,7 +51,8 @@
             this.Text = "form";
             this.Load += new System.EventHandler(this.Form1_Load);
             this.Paint += new System.Windows.Forms.PaintEventHandler(this.mainForm_Paint);
-            this.MouseClick += new System.Windows.Forms.MouseEventHandler(this.mainForm_MouseClick);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.mainForm_KeyDown);
+            this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.mainForm_MouseDown);
             this.Resize += new System.EventHandler(this.mainForm_Resize);
             this.ResumeLayout(false);
 
